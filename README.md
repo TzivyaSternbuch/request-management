@@ -20,6 +20,12 @@ git submodule update --init
 
 Prerequisites: .NET 8 runtime + an SDK that can build `net8.0` (8.0 or newer), Node.js 20+.
 
+**Both at once** (Windows) – opens one window for the backend and one for the frontend:
+
+```powershell
+./dev.ps1
+```
+
 **Backend** – listens on `https://localhost:60701` / `http://localhost:60702`, Swagger at `/swagger`:
 
 ```bash

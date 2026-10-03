@@ -1,0 +1,5 @@
+# Store text as LF in the repo and keep LF in the working copy on every OS.
+* text=auto eol=lf
+
+# PowerShell scripts run on Windows.
+*.ps1 text eol=crlf

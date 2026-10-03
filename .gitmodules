@@ -1,0 +1,6 @@
+[submodule "front"]
+	path = front
+	url = https://github.com/TzivyaSternbuch/request-management-front.git
+[submodule "server"]
+	path = server
+	url = https://github.com/TzivyaSternbuch/request-management-server.git

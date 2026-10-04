@@ -61,6 +61,10 @@ Api  ──►  Application  ──►  Domain
   DI registration (`AddInfrastructure`). The only place that knows about EF.
 - **Api** (`Requests.Api`): controllers, `Program.cs`. Controllers are thin: read the request
   (route/query/headers), call one service method, return the result. No business logic, no `DbContext`.
+  Get the current user with `User.ToCurrentUser()` (`Api/Authentication/ClaimsPrincipalExtensions.cs`);
+  never read the `X-User-Id` / `X-Is-Admin` headers or the claims directly in a controller.
+  All controllers require a user (`MapControllers().RequireAuthorization()` in `Program.cs`);
+  mark public endpoints with `[AllowAnonymous]`; don't add `[Authorize]`.
 
 ### Conventions
 

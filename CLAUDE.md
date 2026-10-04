@@ -40,6 +40,8 @@ Current user is simulated with headers `X-User-Id: <int>` and `X-Is-Admin: true|
 
 - Names say what a thing is or does; no abbreviations (`request`, not `req`/`r`), except `x` in short lambdas.
 - Small methods/functions with one responsibility; early returns instead of deep nesting.
+- One topic per file, and the file name says what is in it. Don't mix unrelated things in one file
+  (e.g. a `types.ts` holding request models, paging, errors and the current user).
 - No dead code, commented-out code, or unused usings/imports.
 - No magic strings/numbers – use a named constant or enum.
 - Comments explain *why*, not *what*. Keep them rare.
@@ -91,14 +93,60 @@ Api  ──►  Application  ──►  Domain
 
 ## Front (React + TypeScript)
 
+### Stack
+
+- UI: Material UI v9, light theme only (`src/theme.ts`). Import each component from its own path
+  (`@mui/material/Button`).
+- Screens are React Router routes (`App.tsx`).
+- Server data is loaded with TanStack Query inside custom hooks. It is a server-data cache,
+  not a global state store.
+- `vite.config.ts` splits the bundle into `mui` and `vendor` chunks to keep the build free of the
+  chunk-size warning; a new large library may need its own group.
+
+### Folders
+
+| Folder | Holds | Never holds |
+|---|---|---|
+| `src/api/` | HTTP calls (`requestsApi.ts`), server models (`*Models.ts`), `ApiError` | React / UI code |
+| `src/hooks/` | Data loading with TanStack Query, turning errors into messages | `fetch`, JSX |
+| `src/components/` | Rendering | HTTP calls, data logic |
+| `src/auth/` | The current user (`currentUser.ts`) | |
+
+### Conventions
+
 - Function components only; one component per file, `PascalCase.tsx`.
 - No `any`. Type API data with interfaces that mirror the server DTOs (same field names, camelCase).
-- All HTTP calls go through one module (e.g. `src/api/`), never `fetch` directly inside components.
+- Server enums are string-literal unions (`'New' | 'InProgress'`), not TS `enum`
+  (`erasableSyntaxOnly` forbids it).
+- All HTTP calls go through `src/api/`, never `fetch` directly inside components or hooks.
   Use relative `/api/...` URLs (the Vite proxy handles the backend address).
-- Logic and data loading in custom hooks (`useRequests`); components focus on rendering.
+- Logic and data loading in custom hooks (`useRequestSearch`); components focus on rendering.
+  A hook returns a simple state (`{ data, error, isLoading }`), not the raw TanStack Query object.
+- Errors: `src/api/` throws `ApiError` with the server's `ProblemDetails`, the hook turns it into
+  a readable message, components only show it.
 - Always handle the three states of a request: loading, error, data (including empty).
+  Use `StateMessage` for loading / error / empty screens.
 - Keep state as local as possible; no global state library unless clearly needed.
+- No deprecated APIs or types; editor deprecation hints count as warnings
+  (e.g. `SubmitEvent`, not `FormEvent`).
 - `npm run lint`, `npm test` and `npm run build` must pass with no warnings before committing.
+
+### Naming
+
+- Module-level constants: `UPPER_SNAKE_CASE` (`FIRST_PAGE`, `STATUS_COLORS`). Keys of lookup
+  records keep the server values (`InProgress`).
+- `xxxApi.ts` – functions that call the server, named by action (`searchRequests`).
+- `xxxModels.ts` – interfaces mirroring server DTOs (`requestModels.ts`, `commonModels.ts`).
+- `useXxx.ts` – one hook per use case.
+- Components by role: `XxxPage` (a screen, one per route), `XxxLayout` (frame around pages),
+  `XxxForm`, `XxxTable`, … (parts of a page). Props interface `XxxProps` in the same file.
+- A helper or constant used by one file stays private in that file; no `utils/` or `constants.ts`
+  until something is shared.
+
+### Classes
+
+- No classes, except error types that extend `Error` (`ApiError`) so `instanceof` works.
+- Declare class fields explicitly; `erasableSyntaxOnly` forbids `constructor(public status: number)`.
 
 ### Tests (Vitest + React Testing Library)
 

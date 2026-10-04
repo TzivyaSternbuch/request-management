@@ -66,7 +66,7 @@ Api  ──►  Application  ──►  Domain
 
 - Feature folders: `Application/Requests/`, `Infrastructure/Repositories/`, etc.
 - File-scoped namespaces matching the folder path.
-- `sealed` classes by default; `record` for DTOs (`RequestDto`).
+- `record` for DTOs (`RequestDto`). Don't use `sealed` unless there is a concrete reason.
 - Constructor injection into `private readonly` fields named `_camelCase`.
 - Interfaces start with `I` and sit next to the code that uses them (Application).
 - Async all the way: methods end with `Async`, return `Task<...>`, and take

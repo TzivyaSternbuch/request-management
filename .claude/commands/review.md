@@ -4,7 +4,7 @@ argument-hint: "[file, folder or git range – default: all uncommitted changes]
 ---
 
 Review code changes for clean code against the rules in `CLAUDE.md`.
-Do NOT edit any files – report only.
+Report only. Do NOT edit any files, and do not offer, ask about, or apply fixes.
 
 Scope: $ARGUMENTS
 If no scope is given, review all uncommitted changes in the root repo AND inside the
@@ -23,7 +23,7 @@ plus untracked files from `git status` in each).
 4. **Naming** – unclear or abbreviated names, names that don't match behaviour.
 5. **Leftovers** – dead code, commented-out code, unused usings/imports, debug logs, TODOs.
 6. **Magic values** – literal strings/numbers that should be constants or enums.
-7. **Conventions** – `Async` suffix + `CancellationToken`, `sealed`, `_camelCase` fields,
+7. **Conventions** – `Async` suffix + `CancellationToken`, no unneeded `sealed`, `_camelCase` fields,
    no `any`, HTTP only via the `src/api/` module, loading/error/empty states handled.
 8. **Data access** – filtering in memory instead of in the database; N+1 queries.
 9. **Tests** – business rules or edge cases in the change that have no test
@@ -51,4 +51,4 @@ A table sorted by severity (High → Medium → Low):
 
 Then one line: overall verdict (ready to commit / fix High items first).
 Do not list praise or things that are fine. If nothing is found, say so in one line.
-Ask which items to fix before changing anything.
+End after the verdict line. Do not ask which items to fix – fixing is a separate request.

@@ -23,7 +23,7 @@ plus untracked files from `git status` in each).
 4. **Naming** – unclear or abbreviated names, names that don't match behaviour.
 5. **Leftovers** – dead code, commented-out code, unused usings/imports, debug logs, TODOs.
 6. **Magic values** – literal strings/numbers that should be constants or enums.
-7. **Conventions** – `Async` suffix + `CancellationToken`, `sealed`, `_camelCase` fields,
+7. **Conventions** – `Async` suffix + `CancellationToken`, `_camelCase` fields,
    no `any`, HTTP only via the `src/api/` module, loading/error/empty states handled.
 8. **Data access** – filtering in memory instead of in the database; N+1 queries.
 9. **Tests** – business rules or edge cases in the change that have no test

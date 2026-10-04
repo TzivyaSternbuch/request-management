@@ -30,6 +30,7 @@ Current user is simulated with headers `X-User-Id: <int>` and `X-Is-Admin: true|
 
 - Only do what was asked. No feature code unless explicitly requested.
 - Keep changes small and focused; one concern per commit.
+- Work in a git worktree on the current branch. Do not create a new branch.
 - Before any commit or push: list the files and target repo, and wait for approval.
 - When introducing a new tool, package or pattern, explain what it is and why.
 - After changing code: run the tests/lint above and report the real result.

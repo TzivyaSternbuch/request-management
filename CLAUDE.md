@@ -24,7 +24,8 @@ the root repo then commits the updated submodule pointer.
 | Lint / typecheck frontend | `cd front && npm run lint && npm run build` |
 | Test frontend | `cd front && npm test` (Vitest – once set up) |
 
-Current user is simulated with headers `X-User-Id: <int>` and `X-Is-Admin: true|false`.
+Current user is simulated with the header `X-User-Id: <int>`; the server loads the user (and their
+administrator role) from the `Users` table and returns 401 for an unknown id.
 
 ## How to work in this repo
 
@@ -65,7 +66,7 @@ Api  ──►  Application  ──►  Domain
 - **Api** (`Requests.Api`): controllers, `Program.cs`. Controllers are thin: read the request
   (route/query/headers), call one service method, return the result. No business logic, no `DbContext`.
   Get the current user with `User.ToCurrentUser()` (`Api/Authentication/ClaimsPrincipalExtensions.cs`);
-  never read the `X-User-Id` / `X-Is-Admin` headers or the claims directly in a controller.
+  never read the `X-User-Id` header or the claims directly in a controller.
   All controllers require a user (`MapControllers().RequireAuthorization()` in `Program.cs`);
   mark public endpoints with `[AllowAnonymous]`; don't add `[Authorize]`.
 

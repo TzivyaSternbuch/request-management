@@ -20,7 +20,8 @@ each piece, then wait for approval:
 - A `RequestsApiFactory : WebApplicationFactory<Program>` that replaces the
   `RequestsDbContext` registration with an in-memory database with a **unique name per test
   class**, so tests don't share data.
-- A small helper to create an `HttpClient` with `X-User-Id` / `X-Is-Admin` headers.
+- A small helper to create an `HttpClient` with the `X-User-Id` header (seed the `Users` table
+  with the users the test needs – an unknown id gets 401).
 
 ## Writing the tests
 

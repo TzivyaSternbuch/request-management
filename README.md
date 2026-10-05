@@ -41,7 +41,9 @@ npm install
 npm run dev
 ```
 
-The current user is simulated with request headers: `X-User-Id: <int>` and `X-Is-Admin: true|false`.
+The current user is simulated with the request header `X-User-Id: <int>`. The server looks the user up in the
+`Users` table: an unknown id gets `401`, and whether the user is an administrator comes from the database,
+never from the request. The seed creates users 1–50; users 1 and 2 are administrators.
 
 ## Tests
 

@@ -64,7 +64,8 @@ The backend uses **SQLite**. The database file `requests.db` is created next to 
 On startup the backend:
 
 1. applies the EF Core migrations (creates the tables and the search indexes),
-2. seeds the data if the tables are empty: **50 users** and **100,000 requests**.
+2. in Development, seeds the data if the tables are empty: **50 users** and **100,000 requests**.
+   Other environments (including the integration tests) start with an empty database.
 
 100,000 requests is a test amount, not a limit. Search, sorting and paging run in the database with
 indexes and return one page at a time, so the same code works with many more rows. To try a larger
@@ -92,15 +93,21 @@ In Swagger use the **Authorize** button.
 
 ## Tests
 
-**Backend** – xUnit, Application services and query logic tested with hand-written fakes:
+The tests are kept to the cases that check a requirement.
+
+**Backend** – xUnit, two projects:
 
 ```bash
 cd server
 dotnet test
 ```
 
-Covers: who may see which request, every search filter, multi-field sorting and paging order,
-and query validation (date range, sort parameters, request number length).
+- `Requests.Tests` (unit): who may see which request, every search filter and its date boundaries,
+  multi-field sorting and paging order, and query validation (page size, date range, sort parameters,
+  request number length).
+- `Requests.IntegrationTests`: the real API in memory (`WebApplicationFactory`) on an in-memory SQLite
+  database. Covers 401 for a missing / invalid / unknown user, 400 with every validation error, the JSON
+  shape the frontend relies on, administrator visibility, combined filters run in SQL, and paging.
 
 **Frontend** – Vitest + React Testing Library, the `src/api/` module is mocked:
 
@@ -111,8 +118,9 @@ npm run lint
 npm run build
 ```
 
-Covers: loading / error / empty / data states, the filter bar (search, status, type, date range, chips,
-clear), sorting by column headers, paging, login, and keeping the user over a page reload.
+Covers: loading / error / empty / data states, the filter bar (search with every filter, removing a chip,
+request number length, date range, clear), live search after a pause, sorting by column headers, paging,
+and staying logged in over a page reload.
 
 ## Technologies and why
 

@@ -106,12 +106,23 @@ Api  ──►  Application  ──►  Domain
 
 ### Folders
 
+Code for one screen lives in `src/features/<feature>/` (`login`, `requests`); everything else is shared.
+
 | Folder | Holds | Never holds |
 |---|---|---|
-| `src/api/` | HTTP calls (`requestsApi.ts`), server models (`*Models.ts`), `ApiError` | React / UI code |
-| `src/hooks/` | Data loading with TanStack Query, turning errors into messages | `fetch`, JSX |
-| `src/components/` | Rendering | HTTP calls, data logic |
-| `src/auth/` | The current user (`currentUser.ts`) | |
+| `src/api/` | Shared HTTP code (`httpClient.ts` with `getJson<T>`), `ApiError`, `commonModels.ts` | React / UI code |
+| `src/auth/` | The current user: model, storage, `useCurrentUser`, user-id rules | |
+| `src/components/` | Shared rendering (`StateMessage`, `DropdownButton`, `layout/`) | HTTP calls, data logic, feature imports |
+| `src/hooks/` | Shared, feature-agnostic hooks (`useDebouncedCallback`) | `fetch`, JSX |
+| `src/sorting/`, `src/utils/` | Shared pure TypeScript (`Sort<TField>`, `nextSorts`, `formatDate`) | React |
+| `features/<feature>/api/` | That feature's server calls (`requestsApi.ts`) and DTOs (`requestModels.ts`) | React / UI code |
+| `features/<feature>/models/` | Client-side types (form values, filters, sorts) | Logic |
+| `features/<feature>/logic/` | Pure business rules and mapping (`requestSearchFormRules.ts`, labels) | React |
+| `features/<feature>/hooks/` | State and data loading (TanStack Query), turning errors into messages | `fetch`, JSX |
+| `features/<feature>/components/` | Rendering | HTTP calls, business rules |
+
+Dependencies point one way: components → hooks → logic / api → `src/api/httpClient`.
+Shared folders never import from `features/`.
 
 ### Conventions
 
@@ -119,11 +130,12 @@ Api  ──►  Application  ──►  Domain
 - No `any`. Type API data with interfaces that mirror the server DTOs (same field names, camelCase).
 - Server enums are string-literal unions (`'New' | 'InProgress'`), not TS `enum`
   (`erasableSyntaxOnly` forbids it).
-- All HTTP calls go through `src/api/`, never `fetch` directly inside components or hooks.
+- All HTTP calls go through an `api/` folder (`getJson` in `src/api/httpClient.ts`), never `fetch`
+  directly inside components or hooks.
   Use relative `/api/...` URLs (the Vite proxy handles the backend address).
 - Logic and data loading in custom hooks (`useRequestSearch`); components focus on rendering.
   A hook returns a simple state (`{ data, error, isLoading }`), not the raw TanStack Query object.
-- Errors: `src/api/` throws `ApiError` with the server's `ProblemDetails`, the hook turns it into
+- Errors: `getJson` throws `ApiError` with the server's `ProblemDetails`, the hook turns it into
   a readable message, components only show it.
 - Always handle the three states of a request: loading, error, data (including empty).
   Use `StateMessage` for loading / error / empty screens.
@@ -137,7 +149,8 @@ Api  ──►  Application  ──►  Domain
 - Module-level constants: `UPPER_SNAKE_CASE` (`FIRST_PAGE`, `STATUS_COLORS`). Keys of lookup
   records keep the server values (`InProgress`).
 - `xxxApi.ts` – functions that call the server, named by action (`searchRequests`).
-- `xxxModels.ts` – interfaces mirroring server DTOs (`requestModels.ts`, `commonModels.ts`).
+- `xxxModels.ts` – types: server DTO mirrors in `api/` (`requestModels.ts`, `commonModels.ts`),
+  client-side types in `models/` (`requestSearchModels.ts`).
 - `useXxx.ts` – one hook per use case.
 - Components by role: `XxxPage` (a screen, one per route), `XxxLayout` (frame around pages),
   `XxxForm`, `XxxTable`, … (parts of a page). Props interface `XxxProps` in the same file.
@@ -152,6 +165,7 @@ Api  ──►  Application  ──►  Domain
 ### Tests (Vitest + React Testing Library)
 
 - Test files sit next to the code: `Component.test.tsx`, `useHook.test.ts`.
-- Mock the `src/api/` module (`vi.mock`), never the network.
+- Mock the feature's `api/` module (`vi.mock`), never the network.
+- Only add tests that check a requirement.
 - Test behaviour the user sees (`getByRole`, `getByText`, `userEvent`), not implementation details.
 - Cover loading, error, empty and data states, and every filter/search interaction.

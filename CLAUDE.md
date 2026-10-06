@@ -86,7 +86,8 @@ Api  ──►  Application  ──►  Domain
 
 ### Tests (`tests/Requests.Tests`, xUnit)
 
-- Test Application services with hand-written fakes (see `FakeRequestRepository`), not mocks libraries.
+- Test Application services with hand-written fakes, not mocks libraries.
+- API tests go in `tests/Requests.IntegrationTests` (`RequestsApiFactory`: real API on in-memory SQLite).
 - Test names describe the behaviour: `RegularUser_CanSeeOwnedOrAssignedRequests`.
 - Arrange / Act / Assert, one behaviour per test; small `Create(...)` helpers for test data.
 - Every business rule (permissions, search filters) gets a test.

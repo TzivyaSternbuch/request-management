@@ -86,7 +86,8 @@ Api  ──►  Application  ──►  Domain
 
 ### Tests (`tests/Requests.Tests`, xUnit)
 
-- Test Application services with hand-written fakes (see `FakeRequestRepository`), not mocks libraries.
+- Test Application services with hand-written fakes, not mocks libraries.
+- API tests go in `tests/Requests.IntegrationTests` (`RequestsApiFactory`: real API on in-memory SQLite).
 - Test names describe the behaviour: `RegularUser_CanSeeOwnedOrAssignedRequests`.
 - Arrange / Act / Assert, one behaviour per test; small `Create(...)` helpers for test data.
 - Every business rule (permissions, search filters) gets a test.
@@ -165,6 +166,6 @@ Shared folders never import from `features/`.
 
 - Test files sit next to the code: `Component.test.tsx`, `useHook.test.ts`.
 - Mock the feature's `api/` module (`vi.mock`), never the network.
-- Keep unit tests for pure logic thin; behaviour already covered by component or hook tests needs none.
+- Only add tests that check a requirement.
 - Test behaviour the user sees (`getByRole`, `getByText`, `userEvent`), not implementation details.
 - Cover loading, error, empty and data states, and every filter/search interaction.
